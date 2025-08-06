@@ -3,6 +3,7 @@ const router = express.Router();
 const controller = require('../controllers/treinoController');
 
 router.get('/', controller.getAll);
+router.get('/:id', controller.getById);
 router.post('/', controller.create);
 
 module.exports = router;
