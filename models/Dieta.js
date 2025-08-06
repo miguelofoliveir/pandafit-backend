@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const DietaSchema = new mongoose.Schema({
+  nome: String,
   horario: String,
   alimentos: [
     {

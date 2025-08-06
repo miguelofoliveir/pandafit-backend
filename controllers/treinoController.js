@@ -101,3 +101,54 @@ exports.create = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.update = async (req, res) => {
+  try {
+    const { nome, grupoMuscular, gruposMusculares, exercicios } = req.body;
+    
+    // Validação: nome é obrigatório se fornecido
+    if (nome !== undefined && (!nome || nome.trim() === '')) {
+      return res.status(400).json({ error: 'Nome do treino não pode ser vazio' });
+    }
+    
+    // Validar grupos musculares se fornecidos
+    if (gruposMusculares && gruposMusculares.length > 0) {
+      validarGruposMusculares(gruposMusculares);
+    }
+    
+    // Validar grupo muscular único se fornecido
+    if (grupoMuscular && !GRUPOS_MUSCULARES_VALIDOS.includes(grupoMuscular)) {
+      return res.status(400).json({ 
+        error: `Grupo muscular inválido: ${grupoMuscular}` 
+      });
+    }
+    
+    const treino = await Treino.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    if (!treino) {
+      return res.status(404).json({ error: 'Treino não encontrado' });
+    }
+    
+    res.json(treino);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    const treino = await Treino.findByIdAndDelete(req.params.id);
+    
+    if (!treino) {
+      return res.status(404).json({ error: 'Treino não encontrado' });
+    }
+    
+    res.json({ message: 'Treino deletado com sucesso', treino });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
